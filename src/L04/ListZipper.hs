@@ -1,6 +1,7 @@
 module L04.ListZipper where
 
 import Data.List
+import L03.Fluffy
 
 data ListZipper a =
   ListZipper [a] a [a]
@@ -11,13 +12,13 @@ data MaybeListZipper a =
   | IsNotListZipper
   deriving Eq
 
-instance Functor ListZipper where
-  fmap f (ListZipper l x r) = ListZipper (fmap f l) (f x) (fmap f r)
+instance Fluffy ListZipper where
+  furry f (ListZipper l x r) = ListZipper (fmap f l) (f x) (fmap f r)
 
-instance Functor MaybeListZipper where
-  fmap f (IsListZipper z) =
-    IsListZipper (fmap f z)
-  fmap _ IsNotListZipper =
+instance Fluffy MaybeListZipper where
+  furry f (IsListZipper z) =
+    IsListZipper (furry f z)
+  furry _ IsNotListZipper =
     IsNotListZipper
 
 fromList ::
@@ -36,7 +37,7 @@ toMaybe IsNotListZipper =
 toMaybe (IsListZipper z) =
   Just z
 
-class Functor f => ListZipper' f where
+class Fluffy f => ListZipper' f where
   toMaybeListZipper ::
     f a
     -> MaybeListZipper a
@@ -382,7 +383,7 @@ insertPushRight a z =
     IsListZipper (ListZipper l x r) -> fromListZipper (ListZipper l a (x:r))
     IsNotListZipper -> z
 
-class Functor f => Apply f where
+class Fluffy f => Apply f where
   (<*>) ::
     f (a -> b)
     -> f a
@@ -392,13 +393,13 @@ class Apply f => Applicative f where
   unit ::
     a -> f a
 
-class Functor f => Extend f where
+class Fluffy f => Extend f where
   (<<=) ::
     (f a -> b)
     -> f a
     -> f b
   f <<= x =
-    fmap f (duplicate x)
+    furry f (duplicate x)
   duplicate ::
     f a
     -> f (f a)
@@ -408,22 +409,16 @@ class Extend f => Comonad f where
     f a
     -> a
 
-class Functor t => Traversable t where
+class Fluffy t => Traversable t where
   traverse ::
     Applicative f =>
     (a -> f b)
     -> t a
     -> f (t b)
 
-instance Traversable Maybe where
-  traverse _ Nothing =
-    unit Nothing
-  traverse f (Just a) =
-    fmap Just (f a)
-
 instance Traversable [] where
   traverse f =
-    foldr (\a b -> fmap (:) (f a) <*> b) (unit [])
+    foldr (\a b -> furry (:) (f a) <*> b) (unit [])
 
 instance Apply ListZipper where
   ListZipper fl fx fr <*> ListZipper al ax ar = ListZipper (zipWith ($) fl al) (fx ax) (zipWith ($) fr ar)
@@ -449,10 +444,10 @@ instance Comonad ListZipper where
 
 instance Traversable ListZipper where
   traverse f (ListZipper l x r) =
-    fmap (ListZipper . reverse) (traverse f $ reverse l) <*> f x <*> traverse f r
+    furry (ListZipper . reverse) (traverse f $ reverse l) <*> f x <*> traverse f r
 
 instance Traversable MaybeListZipper where
   traverse _ IsNotListZipper =
     unit IsNotListZipper
   traverse f (IsListZipper z) =
-    fmap IsListZipper (traverse f z)
+    furry IsListZipper (traverse f z)
