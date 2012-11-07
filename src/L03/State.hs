@@ -71,6 +71,27 @@ instance F.Foldable Optional where
   foldr _ z Empty = z
   foldr f z (Full a) = f a z
 
+filterM ::
+  Misty f =>
+  (a -> f Bool)
+  -> List a
+  -> f (List a)
+filterM _ Nil =
+  unicorn Nil
+filterM p (h :| t) =
+ banana (\q -> furry' (if q
+                         then
+                           (h:|)
+                         else
+                           id) (filterM p t)) (p h)
+
+distinct ::
+  Ord a =>
+  List a
+  -> List a
+distinct x =
+  eval (filterM (\a -> State (\s -> (a `S.notMember` s, a `S.insert` s))) x) S.empty
+
 produce ::
   (a -> a)
   -> a
@@ -90,3 +111,4 @@ isHappy =
                   toInteger .
                   digitToInt) .
              show)
+
