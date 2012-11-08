@@ -5,35 +5,63 @@ module L04.ListZipper where
 import Data.List
 import L03.Fluffy
 
+-- A `ListZipper` is a focussed position, with a list of values to the left and to the right.
+--
+-- For example, taking the list [0,1,2,3,4,5,6], the moving focus to the third position, the zipper looks like:
+-- ListZipper [2,1,0] 3 [4,5,6]
+--
+-- Supposing then we move left on this zipper:
+-- ListZipper [1,0] 2 [3,4,5,6]
+--
+-- then suppose we add 17 to the focus of this zipper:
+-- ListZipper [1,0] 19 [3,4,5,6]
 data ListZipper a =
   ListZipper [a] a [a]
   deriving Eq
 
+-- A `MaybeListZipper` is a data structure that allows us to "fail" zipper operations.
+-- e.g. Moving left when there are no values to the left.
+--
+-- We then overload operations polymorphically to operate on both `ListZipper` and `MaybeListZipper`
+-- using the `ListZipper'` type-class below.
 data MaybeListZipper a =
   IsZ (ListZipper a)
   | IsNotZ
   deriving Eq
 
+-- Exercise 1
+-- Relative Difficulty: 2
+-- Implement the `Fluffy` instance for `ListZipper`.
 instance Fluffy ListZipper where
   furry =
     error "todo"
 
+-- Exercise 2
+-- Relative Difficulty: 2
+-- Implement the `Fluffy` instance for `MaybeListZipper`.
 instance Fluffy MaybeListZipper where
   furry =
     error "todo"
 
+-- Exercise 3
+-- Relative Difficulty: 2
+-- Create a `MaybeListZipper` positioning the focus at the head.
 fromList ::
   [a]
   -> MaybeListZipper a
 fromList =
   error "todo"
 
+-- Exercise 3
+-- Relative Difficulty: 2
+-- Retrieve the `ListZipper` from the `MaybeListZipper` if there is one.
 toMaybe ::
   MaybeListZipper a
   -> Maybe (ListZipper a)
 toMaybe =
   error "todo"
 
+-- The `ListZipper'` type-class that will permit overloading operations.
 class Fluffy f => ListZipper' f where
   toMaybeListZipper ::
     f a
@@ -54,6 +82,9 @@ instance ListZipper' MaybeListZipper where
   fromListZipper =
     IsZ
 
+-- Exercise 4
+-- Relative Difficulty: 2
+-- Convert the given zipper back to a list.
 toList ::
   ListZipper' f =>
   f a
@@ -61,6 +92,9 @@ toList ::
 toList =
   error "todo"
 
+-- Exercise 5
+-- Relative Difficulty: 3
+-- Update the focus of the zipper with the given function on the current focus.
 withFocus ::
   ListZipper' f =>
   (a -> a)
@@ -69,6 +103,10 @@ withFocus ::
 withFocus =
   error "todo"
 
+-- Exercise 6
+-- Relative Difficulty: 2
+-- Set the focus of the zipper to the given value.
+-- ~~~ Use withFocus
 setFocus ::
   ListZipper' f =>
   a
@@ -77,6 +115,9 @@ setFocus ::
 setFocus =
   error "todo"
 
+-- A flipped infix alias for `setFocus`. This allows:
+--
+-- z := 7 -- sets the focus on the zipper z to the value 7.
 (.=) ::
   ListZipper' f =>
   f a
@@ -85,6 +126,9 @@ setFocus =
 (.=) =
   flip setFocus
 
+-- Exercise 7
+-- Relative Difficulty: 2
+-- Returns whether there are values to the left of focus.
 hasLeft ::
   ListZipper' f =>
   f a
