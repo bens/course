@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+
 module L04.ListZipper where
 
 import Data.List
@@ -8,34 +10,29 @@ data ListZipper a =
   deriving Eq
 
 data MaybeListZipper a =
-  IsListZipper (ListZipper a)
-  | IsNotListZipper
+  IsZ (ListZipper a)
+  | IsNotZ
   deriving Eq
 
 instance Fluffy ListZipper where
-  furry f (ListZipper l x r) = ListZipper (fmap f l) (f x) (fmap f r)
+  furry =
+    error "todo"
 
 instance Fluffy MaybeListZipper where
-  furry f (IsListZipper z) =
-    IsListZipper (furry f z)
-  furry _ IsNotListZipper =
-    IsNotListZipper
+  furry =
+    error "todo"
 
 fromList ::
   [a]
   -> MaybeListZipper a
-fromList [] =
-  IsNotListZipper
-fromList (h:t) =
-  IsListZipper (ListZipper [] h t)
+fromList =
+  error "todo"
 
 toMaybe ::
   MaybeListZipper a
   -> Maybe (ListZipper a)
-toMaybe IsNotListZipper =
-  Nothing
-toMaybe (IsListZipper z) =
-  Just z
+toMaybe =
+  error "todo"
 
 class Fluffy f => ListZipper' f where
   toMaybeListZipper ::
@@ -47,7 +44,7 @@ class Fluffy f => ListZipper' f where
 
 instance ListZipper' ListZipper where
   toMaybeListZipper =
-    IsListZipper
+    IsZ
   fromListZipper =
     id
 
@@ -55,26 +52,22 @@ instance ListZipper' MaybeListZipper where
   toMaybeListZipper =
     id
   fromListZipper =
-    IsListZipper
+    IsZ
 
 toList ::
   ListZipper' f =>
   f a
   -> [a]
-toList z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> reverse l ++ x:r
-    IsNotListZipper -> []
+toList =
+  error "todo"
 
 withFocus ::
   ListZipper' f =>
   (a -> a)
   -> f a
   -> f a
-withFocus f z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> fromListZipper (ListZipper l (f x) r)
-    IsNotListZipper -> z
+withFocus =
+  error "todo"
 
 setFocus ::
   ListZipper' f =>
@@ -82,7 +75,7 @@ setFocus ::
   -> f a
   -> f a
 setFocus =
-  withFocus . const
+  error "todo"
 
 (.=) ::
   ListZipper' f =>
@@ -96,82 +89,120 @@ hasLeft ::
   ListZipper' f =>
   f a
   -> Bool
-hasLeft z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l _ _) -> not (null l)
-    IsNotListZipper -> False
+hasLeft =
+  error "todo"
 
 hasRight ::
   ListZipper' f =>
   f a
   -> Bool
-hasRight z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ _ r) -> not (null r)
-    IsNotListZipper -> False
+hasRight =
+  error "todo"
 
 findLeft ::
   ListZipper' f =>
   (a -> Bool)
   -> f a
   -> MaybeListZipper a
-findLeft p z =
-  case moveLeft z of
-    z'@(IsListZipper (ListZipper _ x _)) -> if p x then z' else findLeft p z'
-    IsNotListZipper -> IsNotListZipper
+findLeft =
+  error "todo"
 
 findRight ::
   ListZipper' f =>
   (a -> Bool)
   -> f a
   -> MaybeListZipper a
-findRight p z =
-  case moveRight z of
-    z'@(IsListZipper (ListZipper _ x _)) -> if p x then z' else findRight p z'
-    IsNotListZipper -> IsNotListZipper
+findRight =
+  error "todo"
 
 moveRightLoop ::
   ListZipper' f =>
   f a
   -> f a
-moveRightLoop z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x []) -> let (x':l') = reverse (x:l)
-                                        in fromListZipper (ListZipper [] x' l')
-    IsListZipper (ListZipper l x (h:t)) -> fromListZipper (ListZipper (x:l) h t)
-    IsNotListZipper -> z
+moveRightLoop =
+  error "todo"
 
 -- !! non-total
 moveLeftLoop ::
   ListZipper' f =>
   f a
   -> f a
-moveLeftLoop z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper [] x r) -> let (x':r') = (reverse (x:r))
-                                        in fromListZipper (ListZipper r' x' [])
-    IsListZipper (ListZipper (h:t) x r) -> fromListZipper (ListZipper t h (x:r))
-    IsNotListZipper -> z
+moveLeftLoop =
+  error "todo"
 
 moveRight ::
   ListZipper' f =>
   f a
   -> MaybeListZipper a
-moveRight z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ _ []) -> IsNotListZipper
-    IsListZipper (ListZipper l x (h:t)) -> IsListZipper (ListZipper (x:l) h t)
-    IsNotListZipper -> IsNotListZipper
+moveRight =
+  error "todo"
 
 moveLeft ::
   ListZipper' f =>
   f a
   -> MaybeListZipper a
-moveLeft z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper [] _ _) -> IsNotListZipper
-    IsListZipper (ListZipper (h:t) x r) -> IsListZipper (ListZipper t h (x:r))
-    IsNotListZipper -> IsNotListZipper
+moveLeft =
+  error "todo"
+
+swapRight ::
+  ListZipper' f =>
+  f a
+  -> MaybeListZipper a
+swapRight =
+  error "todo"
+
+swapLeft ::
+  ListZipper' f =>
+  f a
+  -> MaybeListZipper a
+swapLeft =
+  error "todo"
+
+dropRights ::
+  ListZipper' f =>
+  f a
+  -> f a
+dropRights =
+  error "todo"
+
+dropLefts ::
+  ListZipper' f =>
+  f a
+  -> f a
+dropLefts =
+  error "todo"
+
+moveLeftN ::
+  ListZipper' f =>
+  Int
+  -> f a
+  -> MaybeListZipper a
+moveLeftN =
+  error "todo"
+
+moveRightN ::
+  ListZipper' f =>
+  Int
+  -> f a
+  -> MaybeListZipper a
+moveRightN =
+  error "todo"
+
+moveLeftN' ::
+  ListZipper' f =>
+  Int
+  -> f a
+  -> Either Int (f a)
+moveLeftN' =
+  error "todo"
+
+moveRightN' ::
+  ListZipper' f =>
+  Int
+  -> f a
+  -> Either Int (f a)
+moveRightN' =
+  error "todo"
 
 -- non-total
 nth ::
@@ -179,201 +210,67 @@ nth ::
   Int
   -> f a
   -> MaybeListZipper a
-nth i z =
-  case toMaybeListZipper z of
-    g@(IsListZipper z') -> case moveLeftN' i z' of
-                             Left a -> moveRightN (i-a) z
-                             Right (ListZipper l _ _) -> moveLeftN (length l) g
-    z'@IsNotListZipper -> z'
-
-moveLeftN' ::
-  ListZipper' f =>
-  Int
-  -> f a
-  -> Either Int (f a)
-moveLeftN' n z =
-  let moveLeftN'' n' z' q =
-        if n' == 0
-          then
-            Right z'
-          else
-            if n' < 0
-              then
-                moveRightN' (negate n') z
-              else
-                case moveLeft z' of
-                  IsListZipper zz -> moveLeftN'' (n' - 1) (fromListZipper zz) (q + 1)
-                  IsNotListZipper -> Left q
-  in moveLeftN'' n z 0
-
-moveRightN' ::
-  ListZipper' f =>
-  Int
-  -> f a
-  -> Either Int (f a)
-moveRightN' n z =
-  let moveRightN'' n' z' q =
-        if n' == 0
-          then
-            Right z'
-          else
-            if n' < 0
-              then
-                moveLeftN' (negate n') z
-              else
-                case moveRight z' of
-                  IsListZipper zz -> moveRightN'' (n' - 1) (fromListZipper zz) (q + 1)
-                  IsNotListZipper -> Left q
-  in moveRightN'' n z 0
-
-swapRight ::
-  ListZipper' f =>
-  f a
-  -> MaybeListZipper a
-swapRight z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ _ []) -> IsNotListZipper
-    IsListZipper (ListZipper l x (h:t)) -> IsListZipper (ListZipper l h (x:t))
-    IsNotListZipper -> IsNotListZipper
-
-swapLeft ::
-  ListZipper' f =>
-  f a
-  -> MaybeListZipper a
-swapLeft z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper [] _ _) -> IsNotListZipper
-    IsListZipper (ListZipper (h:t) x r) -> IsListZipper (ListZipper (x:t) h r)
-    IsNotListZipper -> IsNotListZipper
-
-dropRights ::
-  ListZipper' f =>
-  f a
-  -> f a
-dropRights z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x _) -> fromListZipper (ListZipper l x [])
-    IsNotListZipper -> z
-
-dropLefts ::
-  ListZipper' f =>
-  f a
-  -> f a
-dropLefts z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ x r) -> fromListZipper (ListZipper [] x r)
-    IsNotListZipper -> z
-
-moveLeftN ::
-  ListZipper' f =>
-  Int
-  -> f a
-  -> MaybeListZipper a
-moveLeftN p z =
-  if p == 0
-    then
-      toMaybeListZipper z
-    else
-      if p < 0
-        then
-          moveRightN (negate p) z
-        else
-          moveLeftN (p-1) (moveLeft z)
-
-moveRightN ::
-  ListZipper' f =>
-  Int
-  -> f a
-  -> MaybeListZipper a
-moveRightN p z =
-  if p == 0
-    then
-      toMaybeListZipper z
-    else
-      if p < 0
-        then
-          moveRightN (negate p) z
-        else
-          moveRightN (p-1) (moveRight z)
+nth =
+  error "todo"
 
 mfocus ::
   ListZipper' f =>
   f a
   -> Maybe a
-mfocus z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ x _) -> Just x
-    IsNotListZipper -> Nothing
+mfocus =
+  error "todo"
 
 index ::
   ListZipper' f =>
   f a
   -> Maybe Int
-index z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l _ _) -> Just (length l)
-    IsNotListZipper -> Nothing
+index =
+  error "todo"
 
 -- non-total
 end ::
   ListZipper' f =>
   f a
   -> f a
-end z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> let (x':r') = reverse (x:r)
-                                       in fromListZipper (ListZipper (r' ++ l) x' [])
-    IsNotListZipper -> z
+end =
+  error "todo"
 
 start ::
   ListZipper' f =>
   f a
   -> f a
-start z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> let (x':r') = reverse (x:l)
-                                       in fromListZipper (ListZipper [] x' (r' ++ r))
-    IsNotListZipper -> z
+start =
+  error "todo"
 
 deletePullRight ::
   ListZipper' f =>
   f a
   -> MaybeListZipper a
-deletePullRight z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper _ _ []) -> IsNotListZipper
-    IsListZipper (ListZipper l _ (h:t)) -> IsListZipper (ListZipper l h t)
-    IsNotListZipper -> IsNotListZipper
+deletePullRight =
+  error "todo"
 
 deletePullLeft ::
   ListZipper' f =>
   f a
   -> MaybeListZipper a
-deletePullLeft z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper [] _ _) -> IsNotListZipper
-    IsListZipper (ListZipper (h:t) _ r) -> IsListZipper (ListZipper t h r)
-    IsNotListZipper -> IsNotListZipper
+deletePullLeft =
+  error "todo"
 
 insertPushLeft ::
   ListZipper' f =>
   a
   -> f a
   -> f a
-insertPushLeft a z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> fromListZipper (ListZipper (x:l) a r)
-    IsNotListZipper -> z
+insertPushLeft =
+  error "todo"
 
 insertPushRight ::
   ListZipper' f =>
   a
   -> f a
   -> f a
-insertPushRight a z =
-  case toMaybeListZipper z of
-    IsListZipper (ListZipper l x r) -> fromListZipper (ListZipper l a (x:r))
-    IsNotListZipper -> z
+insertPushRight =
+  error "todo"
 
 class Fluffy f => Apply f where
   (<*>) ::
@@ -404,41 +301,40 @@ class Fluffy t => Traversable t where
     -> f (t b)
 
 instance Traversable [] where
-  traverse f =
-    foldr (\a b -> furry (:) (f a) <*> b) (unit [])
+  traverse =
+    error "todo"
 
 instance Apply ListZipper where
-  ListZipper fl fx fr <*> ListZipper al ax ar =
-    ListZipper (zipWith ($) fl al) (fx ax) (zipWith ($) fr ar)
+  (<*>) =
+    error "todo"
 
 instance Apply MaybeListZipper where
-  IsNotListZipper <*> _ = IsNotListZipper
-  _ <*> IsNotListZipper = IsNotListZipper
-  IsListZipper f <*> IsListZipper a = IsListZipper (f <*> a)
+  (<*>) =
+    error "todo"
 
 instance Applicative ListZipper where
-  unit a =
-    ListZipper (repeat a) a (repeat a)
+  unit =
+    error "todo"
 
 instance Applicative MaybeListZipper where
-  unit = IsListZipper . unit
+  unit =
+    error "todo"
 
 instance Extend ListZipper where
-  f <<= z =
-    ListZipper (unfoldr (fmap (\z' -> (f z', z')) . toMaybe . moveLeft) z) (f z) (unfoldr (fmap (\z' -> (f z', z')) . toMaybe . moveRight) z)
+  (<<=) =
+    error "todo"
 
 instance Comonad ListZipper where
-  counit (ListZipper _ x _) = x
+  counit =
+    error "todo"
 
 instance Traversable ListZipper where
-  traverse f (ListZipper l x r) =
-    furry (ListZipper . reverse) (traverse f $ reverse l) <*> f x <*> traverse f r
+  traverse =
+    error "todo"
 
 instance Traversable MaybeListZipper where
-  traverse _ IsNotListZipper =
-    unit IsNotListZipper
-  traverse f (IsListZipper z) =
-    furry IsListZipper (traverse f z)
+  traverse =
+    error "todo"
 
 -----------------------
 -- SUPPORT LIBRARIES --
@@ -449,5 +345,5 @@ instance Show a => Show (ListZipper a) where
     (show . reverse $ l) ++ ('⋙':show x ++ "⋘") ++ show r
 
 instance Show a => Show (MaybeListZipper a) where
-  show (IsListZipper z) = show z
-  show IsNotListZipper = "∅"
+  show (IsZ z) = show z
+  show IsNotZ = "∅"
