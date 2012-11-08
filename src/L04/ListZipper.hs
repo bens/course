@@ -117,7 +117,7 @@ setFocus =
 
 -- A flipped infix alias for `setFocus`. This allows:
 --
--- z := 7 -- sets the focus on the zipper z to the value 7.
+-- z := "abc" -- sets the focus on the zipper z to the value "abc".
 (.=) ::
   ListZipper' f =>
   f a
@@ -136,6 +136,9 @@ hasLeft ::
 hasLeft =
   error "todo"
 
+-- Exercise 8
+-- Relative Difficulty: 2
+-- Returns whether there are values to the right of focus.
 hasRight ::
   ListZipper' f =>
   f a
@@ -143,6 +146,9 @@ hasRight ::
 hasRight =
   error "todo"
 
+-- Exercise 9
+-- Relative Difficulty: 3
+-- Move the zipper left until the given predicate matches.
 findLeft ::
   ListZipper' f =>
   (a -> Bool)
@@ -151,6 +157,9 @@ findLeft ::
 findLeft =
   error "todo"
 
+-- Exercise 10
+-- Relative Difficulty: 3
+-- Move the zipper right until the given predicate matches.
 findRight ::
   ListZipper' f =>
   (a -> Bool)
@@ -159,14 +168,10 @@ findRight ::
 findRight =
   error "todo"
 
-moveRightLoop ::
-  ListZipper' f =>
-  f a
-  -> f a
-moveRightLoop =
-  error "todo"
-
--- !! non-total
+-- Exercise 11
+-- Relative Difficulty: 4
+-- Move the zipper left, or if there are no elements to the left, go to the far right.
+-- CAUTION: This function is non-total, why?
 moveLeftLoop ::
   ListZipper' f =>
   f a
@@ -174,13 +179,19 @@ moveLeftLoop ::
 moveLeftLoop =
   error "todo"
 
-moveRight ::
+-- Exercise 12
+-- Relative Difficulty: 4
+-- Move the zipper right, or if there are no elements to the right, go to the far left.
+moveRightLoop ::
   ListZipper' f =>
   f a
-  -> MaybeListZipper a
-moveRight =
+  -> f a
+moveRightLoop =
   error "todo"
 
+-- Exercise 13
+-- Relative Difficulty: 3
+-- Move the zipper one position to the left.
 moveLeft ::
   ListZipper' f =>
   f a
@@ -188,13 +199,19 @@ moveLeft ::
 moveLeft =
   error "todo"
 
-swapRight ::
+-- Exercise 14
+-- Relative Difficulty: 3
+-- Move the zipper one position to the right.
+moveRight ::
   ListZipper' f =>
   f a
   -> MaybeListZipper a
-swapRight =
+moveRight =
   error "todo"
 
+-- Exercise 15
+-- Relative Difficulty: 3
+-- Swap the current focus with the value to the left of focus.
 swapLeft ::
   ListZipper' f =>
   f a
@@ -202,13 +219,19 @@ swapLeft ::
 swapLeft =
   error "todo"
 
-dropRights ::
+-- Exercise 16
+-- Relative Difficulty: 3
+-- Swap the current focus with the value to the right of focus.
+swapRight ::
   ListZipper' f =>
   f a
-  -> f a
-dropRights =
+  -> MaybeListZipper a
+swapRight =
   error "todo"
 
+-- Exercise 17
+-- Relative Difficulty: 3
+-- Drop all values to the left of the focus.
 dropLefts ::
   ListZipper' f =>
   f a
@@ -216,6 +239,19 @@ dropLefts ::
 dropLefts =
   error "todo"
 
+-- Exercise 18
+-- Relative Difficulty: 3
+-- Drop all values to the right of the focus.
+dropRights ::
+  ListZipper' f =>
+  f a
+  -> f a
+dropRights =
+  error "todo"
+
+-- Exercise 19
+-- Relative Difficulty: 4
+-- Move the focus left the given number of positions. If the value is negative, move right instead.
 moveLeftN ::
   ListZipper' f =>
   Int
@@ -224,6 +260,9 @@ moveLeftN ::
 moveLeftN =
   error "todo"
 
+-- Exercise 20
+-- Relative Difficulty: 4
+-- Move the focus right the given number of positions. If the value is negative, move left instead.
 moveRightN ::
   ListZipper' f =>
   Int
@@ -232,6 +271,10 @@ moveRightN ::
 moveRightN =
   error "todo"
 
+-- Exercise 21
+-- Relative Difficulty: 6
+-- Move the focus left the given number of positions. If the value is negative, move right instead.
+-- If the focus cannot be moved, the given number of times, return the value by which it can be moved instead.
 moveLeftN' ::
   ListZipper' f =>
   Int
@@ -240,6 +283,10 @@ moveLeftN' ::
 moveLeftN' =
   error "todo"
 
+-- Exercise 22
+-- Relative Difficulty: 6
+-- Move the focus right the given number of positions. If the value is negative, move left instead.
+-- If the focus cannot be moved, the given number of times, return the value by which it can be moved instead.
 moveRightN' ::
   ListZipper' f =>
   Int
@@ -248,7 +295,9 @@ moveRightN' ::
 moveRightN' =
   error "todo"
 
--- non-total
+-- Exercise 23
+-- Relative Difficulty: 7
+-- Move the focus to the given absolute position in the zipper. Traverse the zipper only to the extent required.
 nth ::
   ListZipper' f =>
   Int
@@ -257,13 +306,9 @@ nth ::
 nth =
   error "todo"
 
-mfocus ::
-  ListZipper' f =>
-  f a
-  -> Maybe a
-mfocus =
-  error "todo"
-
+-- Exercise 24
+-- Relative Difficulty: 4
+-- Return the absolute position of the current focus in the zipper.
 index ::
   ListZipper' f =>
   f a
@@ -271,7 +316,10 @@ index ::
 index =
   error "todo"
 
--- non-total
+-- Exercise 25
+-- Relative Difficulty: 5
+-- Move the focus to the end of the zipper.
+-- CAUTION: This function is non-total, why?
 end ::
   ListZipper' f =>
   f a
@@ -279,6 +327,9 @@ end ::
 end =
   error "todo"
 
+-- Exercise 26
+-- Relative Difficulty: 5
+-- Move the focus to the start of the zipper.
 start ::
   ListZipper' f =>
   f a
@@ -286,13 +337,9 @@ start ::
 start =
   error "todo"
 
-deletePullRight ::
-  ListZipper' f =>
-  f a
-  -> MaybeListZipper a
-deletePullRight =
-  error "todo"
-
+-- Exercise 27
+-- Relative Difficulty: 5
+-- Delete the current focus and pull the left values to take the empty position.
 deletePullLeft ::
   ListZipper' f =>
   f a
@@ -300,6 +347,19 @@ deletePullLeft ::
 deletePullLeft =
   error "todo"
 
+-- Exercise 28
+-- Relative Difficulty: 5
+-- Delete the current focus and pull the right values to take the empty position.
+deletePullRight ::
+  ListZipper' f =>
+  f a
+  -> MaybeListZipper a
+deletePullRight =
+  error "todo"
+
+-- Exercise 29
+-- Relative Difficulty: 5
+-- Insert at the current focus and push the left values to make way for the new position.
 insertPushLeft ::
   ListZipper' f =>
   a
@@ -308,6 +368,9 @@ insertPushLeft ::
 insertPushLeft =
   error "todo"
 
+-- Exercise 30
+-- Relative Difficulty: 5
+-- Insert at the current focus and push the right values to make way for the new position.
 insertPushRight ::
   ListZipper' f =>
   a
@@ -315,6 +378,11 @@ insertPushRight ::
   -> f a
 insertPushRight =
   error "todo"
+
+-- Let's start using proper type-class names.
+--
+-- The following type-class hierarchy does not correspond to the GHC base library hierarchy.
+-- However, it is much more flexible, which we exploit here.
 
 class Fluffy f => Apply f where
   (<*>) ::
@@ -344,38 +412,75 @@ class Fluffy t => Traversable t where
     -> t a
     -> f (t b)
 
+-- The `Traversable` instance for `[]` is implemented for demonstration.
+-- It will also come in use later.
 instance Traversable [] where
-  traverse =
-    error "todo"
+  traverse f =
+    foldr (\a b -> furry (:) (f a) <*> b) (unit [])
 
+-- Exercise 31
+-- Relative Difficulty: 6
+-- Implement the `Apply` instance for `ListZipper`.
+-- This implementation zips functions with values by function application.
 instance Apply ListZipper where
   (<*>) =
     error "todo"
 
+-- Exercise 32
+-- Relative Difficulty: 4
+-- Implement the `Apply` instance for `MaybeListZipper`.
+-- ~~~ Use (<*>) for `ListZipper`.
 instance Apply MaybeListZipper where
   (<*>) =
     error "todo"
 
+-- Exercise 33
+-- Relative Difficulty: 5
+-- Implement the `Applicative` instance for `ListZipper`.
+-- This implementation produces an infinite list zipper (to both left and right).
+-- ~~~ Use Data.List#repeat.
 instance Applicative ListZipper where
   unit =
     error "todo"
 
+-- Exercise 34
+-- Relative Difficulty: 4
+-- Implement the `Applicative` instance for `MaybeListZipper`.
+-- ~~~ Use unit for `ListZipper`.
 instance Applicative MaybeListZipper where
   unit =
     error "todo"
 
+-- Exercise 35
+-- Relative Difficulty: 7
+-- Implement the `Extend` instance for `ListZipper`.
+-- This implementation "visits" every possible zipper value derivable from a given zipper (i.e. all zippers to the left and right).
+-- ~~~ Use unit Data.List#unfoldr.
 instance Extend ListZipper where
   (<<=) =
     error "todo"
 
+-- Exercise 36
+-- Relative Difficulty: 3
+-- Implement the `Comonad` instance for `ListZipper`.
+-- This implementation returns the current focus of the zipper.
 instance Comonad ListZipper where
   counit =
     error "todo"
 
+-- Exercise 37
+-- Relative Difficulty: 10
+-- Implement the `Traversable` instance for `ListZipper`.
+-- This implementation traverses a zipper while running some `Applicative` effect through the zipper.
+-- An effectful zipper is returned.
 instance Traversable ListZipper where
   traverse =
     error "todo"
 
+-- Exercise 38
+-- Relative Difficulty: 5
+-- Implement the `Traversable` instance for `MaybeListZipper`.
+-- ~~~ Use `traverse` for `ListZipper`.
 instance Traversable MaybeListZipper where
   traverse =
     error "todo"
