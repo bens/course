@@ -226,14 +226,6 @@ moveRightN' n z =
                   IsNotListZipper -> Left q
   in moveRightN'' n z 0
 
-instance Show a => Show (ListZipper a) where
-  show (ListZipper l x r) =
-    (show . reverse $ l) ++ ('⋙':show x ++ "⋘") ++ show r
-
-instance Show a => Show (MaybeListZipper a) where
-  show (IsListZipper z) = show z
-  show IsNotListZipper = "∅"
-
 swapRight ::
   ListZipper' f =>
   f a
@@ -398,11 +390,6 @@ class Fluffy f => Extend f where
     (f a -> b)
     -> f a
     -> f b
-  f <<= x =
-    furry f (duplicate x)
-  duplicate ::
-    f a
-    -> f (f a)
 
 class Extend f => Comonad f where
   counit ::
@@ -421,7 +408,8 @@ instance Traversable [] where
     foldr (\a b -> furry (:) (f a) <*> b) (unit [])
 
 instance Apply ListZipper where
-  ListZipper fl fx fr <*> ListZipper al ax ar = ListZipper (zipWith ($) fl al) (fx ax) (zipWith ($) fr ar)
+  ListZipper fl fx fr <*> ListZipper al ax ar =
+    ListZipper (zipWith ($) fl al) (fx ax) (zipWith ($) fr ar)
 
 instance Apply MaybeListZipper where
   IsNotListZipper <*> _ = IsNotListZipper
@@ -436,8 +424,8 @@ instance Applicative MaybeListZipper where
   unit = IsListZipper . unit
 
 instance Extend ListZipper where
-  duplicate z =
-    ListZipper (unfoldr (fmap (\z' -> (z', z')) . toMaybe . moveLeft) z) z (unfoldr (fmap (\z' -> (z', z')) . toMaybe . moveRight) z)
+  f <<= z =
+    ListZipper (unfoldr (fmap (\z' -> (f z', z')) . toMaybe . moveLeft) z) (f z) (unfoldr (fmap (\z' -> (f z', z')) . toMaybe . moveRight) z)
 
 instance Comonad ListZipper where
   counit (ListZipper _ x _) = x
@@ -451,3 +439,15 @@ instance Traversable MaybeListZipper where
     unit IsNotListZipper
   traverse f (IsListZipper z) =
     furry IsListZipper (traverse f z)
+
+-----------------------
+-- SUPPORT LIBRARIES --
+-----------------------
+
+instance Show a => Show (ListZipper a) where
+  show (ListZipper l x r) =
+    (show . reverse $ l) ++ ('⋙':show x ++ "⋘") ++ show r
+
+instance Show a => Show (MaybeListZipper a) where
+  show (IsListZipper z) = show z
+  show IsNotListZipper = "∅"
