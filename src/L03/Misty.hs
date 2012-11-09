@@ -11,73 +11,78 @@ class Misty m where
   -- Relative Difficulty: 3
   -- (use banana and unicorn)
   furry' :: (a -> b) -> m a -> m b
-  furry' = error "todo"
+  furry' = banana . (unicorn .)
 
 -- Exercise 5
 -- Relative Difficulty: 2
 instance Misty List where
-  banana = error "todo"
-  unicorn = error "todo"
+  banana = flatMap
+  unicorn = (:| Nil)
 
 -- Exercise 6
 -- Relative Difficulty: 2
 instance Misty Optional where
-  banana = error "todo"
-  unicorn = error "todo"
+  banana = flip bindOptional
+  unicorn = Full
 
 -- Exercise 7
 -- Relative Difficulty: 3
 instance Misty ((->) t) where
-  banana = error "todo"
-  unicorn = error "todo"
+  banana f g x = f (g x) x
+  unicorn = const
 
 -- Exercise 8
 -- Relative Difficulty: 2
 jellybean :: Misty m => m (m a) -> m a
-jellybean = error "todo"
+jellybean = banana id
 
 -- Exercise 9
 -- Relative Difficulty: 3
 sausage :: Misty m => [m a] -> m [a]
-sausage = error "todo"
+sausage =
+  foldr (\mx mxs -> banana (\x -> flip banana mxs (unicorn . (x:))) mx)
+        (unicorn [])
 
 -- Exercise 10
 -- Relative Difficulty: 3
 moppy :: Misty m => (a -> m b) -> [a] -> m [b]
-moppy = error "todo"
+moppy = (sausage .) . furry'
 
 -- Exercise 11
 -- Relative Difficulty: 4
 rockstar :: Misty m => Int -> m a -> m [a]
-rockstar = error "todo"
+rockstar = (sausage .) . replicate
 
 -- Exercise 12
 -- Relative Difficulty: 9
 filtering  :: Misty m => (a -> m Bool) -> [a] -> m [a]
-filtering = error "todo"
+filtering p =
+  foldr (\x mxs -> banana (flip banana mxs . flip go x) (p x)) (unicorn [])
+  where
+    go b x xs = unicorn $ if b then x:xs else xs
 
 -- Exercise 13
 -- Relative Difficulty: 10
 apple :: Misty m => m (a -> b) -> m a -> m b
-apple = error "todo"
+apple fm xm = banana (flip banana xm . (unicorn .)) fm
 
 -- Exercise 14
 -- Relative Difficulty: 6
 -- (bonus: use apple + furry')
 lemon2 :: Misty m => (a -> b -> c) -> m a -> m b -> m c
-lemon2 = error "todo"
+lemon2 = (apple .) . furry'
 
 -- Exercise 15
 -- Relative Difficulty: 6
 -- (bonus: use apple + lemon2)
 lemon3 :: Misty m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
-lemon3 = error "todo"
+lemon3 = ((apple .) .) . lemon2
 
 -- Exercise 16
 -- Relative Difficulty: 6
 -- (bonus: use apple + lemon3)
 lemon4 :: Misty m => (a -> b -> c -> d -> e) -> m a -> m b -> m c -> m d -> m e
-lemon4 = error "todo"
+lemon4 = (((apple .) .) .) . lemon3
 
 -----------------------
 -- SUPPORT LIBRARIES --
