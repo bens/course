@@ -22,18 +22,18 @@ newtype State s a =
 -- Relative Difficulty: 2
 -- Implement the `Fluffy` instance for `State s`.
 instance Fluffy (State s) where
-  furry =
-    error "todo"
+  furry f (State m) =
+    State $ \s -> let (x, s') = m s in (f x, s')
 
 -- Exercise 2
 -- Relative Difficulty: 3
 -- Implement the `Misty` instance for `State s`.
 -- Make sure the state value is passed through in `banana`.
 instance Misty (State s) where
-  banana =
-    error "todo"
-  unicorn =
-    error "todo"
+  banana f (State m) =
+    State $ \s -> let (x, s') = m s in runState (f x) s'
+  unicorn x =
+    State $ \s -> (x, s)
 
 -- Exercise 3
 -- Relative Difficulty: 1
@@ -43,7 +43,7 @@ exec ::
   -> s
   -> s
 exec =
-  error "todo"
+  (snd .) . runState
 
 -- Exercise 4
 -- Relative Difficulty: 1
@@ -53,7 +53,7 @@ eval ::
   -> s
   -> a
 eval =
-  error "todo"
+  (fst .) . runState
 
 -- Exercise 5
 -- Relative Difficulty: 2
@@ -61,7 +61,7 @@ eval =
 get ::
   State s s
 get =
-  error "todo"
+  State $ \s -> (s, s)
 
 -- Exercise 6
 -- Relative Difficulty: 2
@@ -69,8 +69,22 @@ get =
 put ::
   s
   -> State s ()
-put =
-  error "todo"
+put s =
+  State $ const ((), s)
+
+data Iter a = Skip | Yield a | Found a
+
+iterM :: Misty f => List (f (Iter a)) -> f (List a)
+iterM =
+  foldRight (\mx -> flip banana mx . go) (unicorn Nil)
+  where
+    go mxs it = case it of
+      Skip    -> mxs
+      Yield x -> banana (unicorn . (x :|)) mxs
+      Found x  -> unicorn (x :| Nil)
+
+listToOptM :: Misty f => f (List a) -> f (Optional a)
+listToOptM = furry' (flip headOr Empty . furry' Full)
 
 -- Exercise 7
 -- Relative Difficulty: 5
@@ -87,8 +101,9 @@ findM ::
   (a -> f Bool)
   -> List a
   -> f (Optional a)
-findM =
-  error "todo"
+findM f = listToOptM . iterM . maap go
+  where
+    go x = banana (\b -> if b then unicorn (Found x) else unicorn Skip) (f x)
 
 -- Exercise 8
 -- Relative Difficulty: 4
@@ -100,7 +115,10 @@ firstRepeat ::
   List a
   -> Optional a
 firstRepeat =
-  error "todo"
+  flip eval S.empty . findM (flip banana get . go)
+  where
+    go x seen =
+      banana (const $ unicorn (S.member x seen)) $ put (S.insert x seen)
 
 -- Exercise 9
 -- Relative Difficulty: 5
@@ -116,8 +134,10 @@ filterM ::
   (a -> f Bool)
   -> List a
   -> f (List a)
-filterM =
-  error "todo"
+filterM p =
+  iterM . maap go
+  where
+    go x = banana (\b -> unicorn $ if b then Yield x else Skip) (p x)
 
 -- Exercise 10
 -- Relative Difficulty: 4
@@ -128,18 +148,24 @@ distinct ::
   List a
   -> List a
 distinct =
-  error "todo"
+  flip eval S.empty . filterM (flip banana get . go)
+  where
+    go x seen =
+      banana (const $ unicorn (S.notMember x seen)) $ put (S.insert x seen)
 
 -- Exercise 11
 -- Relative Difficulty: 3
 -- This function produces an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
+--
+-- Should this go into src/L02/List.hs?  Can't see anything Misty or State
+-- related about it
 produce ::
   (a -> a)
   -> a
   -> List a
-produce =
-  error "todo"
+produce f x =
+  x :| produce f (f x)
 
 -- Exercise 12
 -- Relative Difficulty: 10
