@@ -76,9 +76,16 @@ instance Arbitrary a => Arbitrary (ListZipper a) where
     x  <- arbitrary
     rs <- arbitrary
     return $ ListZipper ls x rs
+  shrink (ListZipper ls x rs) = do
+    ls' <- shrink ls
+    x'  <- shrink x
+    rs' <- shrink rs
+    return $ ListZipper ls' x' rs'
 
 instance Arbitrary a => Arbitrary (MaybeListZipper a) where
   arbitrary = frequency [(1, return IsNotZ), (80, fmap IsZ arbitrary)]
+  shrink IsNotZ = []
+  shrink (IsZ z) = IsNotZ : fmap IsZ (shrink z)
 
 testcase_furryListZipper ::
   Assertion
