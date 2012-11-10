@@ -52,6 +52,16 @@ test =
     , testCase "moveRight (empty)" testcase_moveRight_empty
     , testCase "moveRight (at right)" testcase_moveRight_atRight
     , testCase "moveRight (ok)" testcase_moveRight_notAtRight
+    , testCase "swapLeft (empty)" testcase_swapLeft_empty
+    , testCase "swapLeft (at left)" testcase_swapLeft_atLeft
+    , testCase "swapLeft (ok)" testcase_swapLeft_notAtLeft
+    , testProperty "swapLeft . swapLeft" prop_swapLeft
+    , testCase "swapRight (empty)" testcase_swapRight_empty
+    , testCase "swapRight (at right)" testcase_swapRight_atRight
+    , testCase "swapRight (ok)" testcase_swapRight_notAtRight
+    , testProperty "swapRight . swapRight" prop_swapRight
+    , testProperty "dropLefts" prop_dropLefts
+    , testProperty "dropRights" prop_dropRights
     ]
 
 testcase_furryListZipper ::
@@ -245,3 +255,59 @@ testcase_moveRight_notAtRight ::
   Assertion
 testcase_moveRight_notAtRight =
   moveRight (ListZipper [0] 1 [2]) @?= IsZ (ListZipper [1,0 :: Int] 2 [])
+
+testcase_swapLeft_empty ::
+  Assertion
+testcase_swapLeft_empty =
+  swapLeft IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_swapLeft_atLeft ::
+  Assertion
+testcase_swapLeft_atLeft =
+  swapLeft (ListZipper [] 0 [1,2 :: Int]) @?= IsNotZ
+
+testcase_swapLeft_notAtLeft ::
+  Assertion
+testcase_swapLeft_notAtLeft =
+  swapLeft (ListZipper [1,0] 2 []) @?= IsZ (ListZipper [2,0 :: Int] 1 [])
+
+prop_swapLeft ::
+  (Int, Int, [Int])
+  -> Bool
+prop_swapLeft (x, l, ls) =
+  let z = IsZ (ListZipper (l:ls) x [])
+  in (swapLeft . swapLeft) z == z
+
+testcase_swapRight_empty ::
+  Assertion
+testcase_swapRight_empty =
+  swapRight IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_swapRight_atRight ::
+  Assertion
+testcase_swapRight_atRight =
+  swapRight (ListZipper [1,0 :: Int] 2 []) @?= IsNotZ
+
+testcase_swapRight_notAtRight ::
+  Assertion
+testcase_swapRight_notAtRight =
+  swapRight (ListZipper [] 0 [1,2]) @?= IsZ (ListZipper [] 1 [0,2 :: Int])
+
+prop_swapRight ::
+  (Int, Int, [Int])
+  -> Bool
+prop_swapRight (x, r, rs) =
+  let z = IsZ (ListZipper [] x (r:rs))
+  in (swapRight . swapRight) z == z
+
+prop_dropLefts ::
+  NonEmptyList Int
+  -> Bool
+prop_dropLefts (NonEmpty (x:ls)) =
+  hasLeft (dropLefts (ListZipper ls x [])) == False
+
+prop_dropRights ::
+  NonEmptyList Int
+  -> Bool
+prop_dropRights (NonEmpty (x:rs)) =
+  hasRight (dropRights (ListZipper [] x rs)) == False
