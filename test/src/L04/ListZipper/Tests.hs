@@ -32,8 +32,14 @@ test =
     , testCase "hasLeft (no)" testcase_hasLeft_no
     , testCase "hasRight (yes)" testcase_hasRight_yes
     , testCase "hasRight (no)" testcase_hasRight_no
-    , testProperty "findLeft (no movement)" prop_findLeft_alreadyThere
-    , testProperty "findLeft (unsatisfiable)" prop_findLeft_nowhere
+    , testCase "findLeft (empty)" testcase_findLeft_empty
+    , testProperty "findLeft" prop_findLeft
+    , testProperty "findLeft has a 0 unit" prop_findLeft_0_unit
+    -- , testProperty "findLeft has an identity" prop_findLeft_1_unit
+    , testCase "findRight (empty)" testcase_findRight_empty
+    , testProperty "findRight" prop_findRight
+    , testProperty "findRight has a 0 unit" prop_findRight_0_unit
+    -- , testProperty "findRight has an identity" prop_findRight_1_unit
     ]
 
 testcase_furryListZipper ::
@@ -102,16 +108,68 @@ testcase_hasRight_no ::
 testcase_hasRight_no =
   hasRight (ListZipper [1,0 :: Int] 2 []) @?= False
 
-prop_findLeft_alreadyThere ::
-  [Int]
-  -> Bool
-prop_findLeft_alreadyThere xs =
-  findLeft (const True) (fromList xs) == fromList xs
+testcase_findLeft_empty ::
+  Assertion
+testcase_findLeft_empty =
+  findLeft (\_ -> True) (IsNotZ :: MaybeListZipper Int) @?= IsNotZ
 
-prop_findLeft_nowhere ::
-  [Int]
+prop_findLeft ::
+  Fun Int Bool
+  -> NonEmptyList Int
   -> Bool
-prop_findLeft_nowhere xs =
-  case xs of
-    [] -> findLeft (const False) IsNotZ == (IsNotZ :: MaybeListZipper Int)
-    (x:xs') -> findLeft (const False) (IsZ (ListZipper [] x xs')) == IsNotZ
+prop_findLeft (Fun _ f) (NonEmpty (x:ls)) =
+  (if null (filter f ls) then (== IsNotZ) else (/= IsNotZ)) $
+    findLeft f (ListZipper ls x [])
+
+prop_findLeft_0_unit ::
+  Fun Int Bool
+  -> NonEmptyList Int
+  -> Bool
+prop_findLeft_0_unit (Fun _ f) (NonEmpty (x:ls)) =
+  let z = IsZ (ListZipper ls x [])
+      u0 = findLeft (const False)
+  in (u0 . findLeft f) z == u0 z && (findLeft f . u0) z == u0 z
+
+-- Not currently true
+prop_findLeft_1_unit ::
+  Fun Int Bool
+  -> NonEmptyList Int
+  -> Bool
+prop_findLeft_1_unit (Fun _ f) (NonEmpty (x:ls)) =
+  let z = IsZ (ListZipper ls x [])
+      u0 = findLeft (const True)
+  in (u0 . findLeft f) z == findLeft f z &&
+     (findLeft f . u0) z == findLeft f z
+
+testcase_findRight_empty ::
+  Assertion
+testcase_findRight_empty =
+  findRight (\_ -> True) (IsNotZ :: MaybeListZipper Int) @?= IsNotZ
+
+prop_findRight ::
+  Fun Int Bool
+  -> NonEmptyList Int
+  -> Bool
+prop_findRight (Fun _ f) (NonEmpty (x:rs)) =
+  (if null (filter f rs) then (== IsNotZ) else (/= IsNotZ)) $
+    findRight f (ListZipper [] x rs)
+
+prop_findRight_0_unit ::
+  Fun Int Bool
+  -> NonEmptyList Int
+  -> Bool
+prop_findRight_0_unit (Fun _ f) (NonEmpty (x:rs)) =
+  let z = IsZ (ListZipper [] x rs)
+      u0 = findRight (const False)
+  in (u0 . findRight f) z == u0 z && (findRight f . u0) z == u0 z
+
+-- Not currently true
+prop_findRight_1_unit ::
+  Fun Int Bool
+  -> NonEmptyList Int
+  -> Bool
+prop_findRight_1_unit (Fun _ f) (NonEmpty (x:rs)) =
+  let z = IsZ (ListZipper [] x rs)
+      u0 = findRight (const True)
+  in (u0 . findRight f) z == findRight f z &&
+     (findRight f . u0) z == findRight f z
