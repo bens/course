@@ -40,6 +40,18 @@ test =
     , testProperty "findRight" prop_findRight
     , testProperty "findRight has a 0 unit" prop_findRight_0_unit
     -- , testProperty "findRight has an identity" prop_findRight_1_unit
+    , testCase "moveLeftLoop (empty)" testcase_moveLeftLoop_empty
+    , testCase "moveLeftLoop (looping)" testcase_moveLeftLoop_loop
+    , testCase "moveLeftLoop (no looping)" testcase_moveLeftLoop_noloop
+    , testCase "moveRightLoop (empty)" testcase_moveRightLoop_empty
+    , testCase "moveRightLoop (looping)" testcase_moveRightLoop_loop
+    , testCase "moveRightLoop (no looping)" testcase_moveRightLoop_noloop
+    , testCase "moveLeft (empty)" testcase_moveLeft_empty
+    , testCase "moveLeft (at left)" testcase_moveLeft_atLeft
+    , testCase "moveLeft (ok)" testcase_moveLeft_notAtLeft
+    , testCase "moveRight (empty)" testcase_moveRight_empty
+    , testCase "moveRight (at right)" testcase_moveRight_atRight
+    , testCase "moveRight (ok)" testcase_moveRight_notAtRight
     ]
 
 testcase_furryListZipper ::
@@ -173,3 +185,63 @@ prop_findRight_1_unit (Fun _ f) (NonEmpty (x:rs)) =
       u0 = findRight (const True)
   in (u0 . findRight f) z == findRight f z &&
      (findRight f . u0) z == findRight f z
+
+testcase_moveLeftLoop_empty ::
+  Assertion
+testcase_moveLeftLoop_empty =
+  moveLeftLoop IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_moveLeftLoop_loop ::
+  Assertion
+testcase_moveLeftLoop_loop =
+  moveLeftLoop (ListZipper [] 0 [1,2]) @?= ListZipper [1,0 :: Int] 2 []
+
+testcase_moveLeftLoop_noloop ::
+  Assertion
+testcase_moveLeftLoop_noloop =
+  moveLeftLoop (ListZipper [0] 1 [2]) @?= ListZipper [] 0 [1,2 :: Int]
+
+testcase_moveRightLoop_empty ::
+  Assertion
+testcase_moveRightLoop_empty =
+  moveRightLoop IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_moveRightLoop_loop ::
+  Assertion
+testcase_moveRightLoop_loop =
+  moveRightLoop (ListZipper [1,0 :: Int] 2 []) @?= ListZipper [] 0 [1,2]
+
+testcase_moveRightLoop_noloop ::
+  Assertion
+testcase_moveRightLoop_noloop =
+  moveRightLoop (ListZipper [0] 1 [2 :: Int]) @?= ListZipper [1,0] 2 []
+
+testcase_moveLeft_empty ::
+  Assertion
+testcase_moveLeft_empty =
+  moveLeft IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_moveLeft_atLeft ::
+  Assertion
+testcase_moveLeft_atLeft =
+  moveLeft (IsZ (ListZipper [] 0 [1,2 :: Int])) @?= IsNotZ
+
+testcase_moveLeft_notAtLeft ::
+  Assertion
+testcase_moveLeft_notAtLeft =
+  moveLeft (ListZipper [0] 1 [2]) @?= IsZ (ListZipper [] 0 [1,2 :: Int])
+
+testcase_moveRight_empty ::
+  Assertion
+testcase_moveRight_empty =
+  moveRight IsNotZ @?= (IsNotZ :: MaybeListZipper Int)
+
+testcase_moveRight_atRight ::
+  Assertion
+testcase_moveRight_atRight =
+  moveRight (IsZ (ListZipper [1,2 :: Int] 0 [])) @?= IsNotZ
+
+testcase_moveRight_notAtRight ::
+  Assertion
+testcase_moveRight_notAtRight =
+  moveRight (ListZipper [0] 1 [2]) @?= IsZ (ListZipper [1,0 :: Int] 2 [])
