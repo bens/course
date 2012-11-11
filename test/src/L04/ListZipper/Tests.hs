@@ -68,6 +68,12 @@ test =
     , testProperty "moveLeftN (negative)" prop_moveLeftN_negative
     , testProperty "moveRightN (positive)" prop_moveRightN_positive
     , testProperty "moveRightN (negative)" prop_moveRightN_negative
+    , testProperty "moveLeftN'" prop_moveLeftN'
+    , testProperty "moveRightN'" prop_moveRightN'
+    , testProperty "nth" prop_nth
+    , testProperty "index" prop_index
+    , testProperty "end" prop_end
+    , testProperty "start" prop_start
     ]
 
 instance Arbitrary a => Arbitrary (ListZipper a) where
@@ -356,3 +362,57 @@ prop_moveRightN_negative ::
   -> Bool
 prop_moveRightN_negative (Positive n) z =
   moveRightN (negate n) z == moveLeftN n z
+
+prop_moveLeftN' ::
+  Int
+  -> ListZipper Int
+  -> Bool
+prop_moveLeftN' n z@(ListZipper ls _ _) =
+  case (n >= 0, n > length ls, moveLeftN' n (IsZ z)) of
+    ( True, False, Right z') -> moveLeftN n z == z'
+    ( True,  True,  Left n') -> n' == length ls
+    (False,     _,        _) -> moveLeftN' (negate n) z == moveRightN' n z
+    _ -> False
+
+prop_moveRightN' ::
+  Int
+  -> ListZipper Int
+  -> Bool
+prop_moveRightN' n z@(ListZipper _ _ rs) =
+  case (n >= 0, n > length rs, moveRightN' n (IsZ z)) of
+    ( True, False, Right z') -> moveRightN n z == z'
+    ( True,  True,  Left n') -> n' == length rs
+    (False,     _,        _) -> moveRightN' (negate n) z == moveLeftN' n z
+    _ -> False
+
+prop_nth ::
+  Int
+  -> MaybeListZipper Int
+  -> Property
+prop_nth n z =
+  cover withinBounds 80 "Index is within zipper's bounds" $
+    if withinBounds
+      then moveLeftN n (nth n z) == fromList (toList z)
+      else nth n z == IsNotZ
+  where
+    withinBounds = 0 <= n && n < length (toList z)
+
+prop_index ::
+  MaybeListZipper Int
+  -> Bool
+prop_index z =
+  maybe (z == IsNotZ) (\i -> moveLeftN i z == fromList (toList z)) $ index z
+
+prop_end ::
+  MaybeListZipper Int
+  -> Bool
+prop_end z =
+  toList (end z) == toList z &&
+    maybe (z == IsNotZ) (== length (toList z) - 1) (index $ end z)
+
+prop_start ::
+  MaybeListZipper Int
+  -> Bool
+prop_start z =
+  toList (start z) == toList z &&
+    maybe (z == IsNotZ) (== 0) (index $ start z)
