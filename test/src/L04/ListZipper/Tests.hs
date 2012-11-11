@@ -64,10 +64,8 @@ test =
     , testProperty "swapRight . swapRight" prop_swapRight
     , testProperty "dropLefts" prop_dropLefts
     , testProperty "dropRights" prop_dropRights
-    , testProperty "moveLeftN (positive)" prop_moveLeftN_positive
-    , testProperty "moveLeftN (negative)" prop_moveLeftN_negative
-    , testProperty "moveRightN (positive)" prop_moveRightN_positive
-    , testProperty "moveRightN (negative)" prop_moveRightN_negative
+    , testProperty "moveLeftN" prop_moveLeftN
+    , testProperty "moveRightN" prop_moveRightN
     , testProperty "moveLeftN'" prop_moveLeftN'
     , testProperty "moveRightN'" prop_moveRightN'
     , testProperty "nth" prop_nth
@@ -335,33 +333,23 @@ prop_dropRights ::
 prop_dropRights z =
   hasRight (dropRights z) == False
 
-prop_moveLeftN_positive ::
-  Positive Int
+prop_moveLeftN ::
+  Int
   -> MaybeListZipper Int
   -> Bool
-prop_moveLeftN_positive (Positive n) z =
-  moveLeftN n z == moveLeftN (pred n) (moveLeft z)
+prop_moveLeftN n z
+  | n == 0 = moveLeftN n z == z
+  | n > 0 = moveLeftN n z == moveLeftN (pred n) (moveLeft z)
+  | otherwise = moveLeftN (negate n) z == moveRightN n z
 
-prop_moveLeftN_negative ::
-  Positive Int
-  -> ListZipper Int
-  -> Bool
-prop_moveLeftN_negative (Positive n) z =
-  moveLeftN (negate n) z == moveRightN n z
-
-prop_moveRightN_positive ::
-  Positive Int
+prop_moveRightN ::
+  Int
   -> MaybeListZipper Int
   -> Bool
-prop_moveRightN_positive (Positive n) z =
-  moveRightN n z == moveRightN (pred n) (moveRight z)
-
-prop_moveRightN_negative ::
-  Positive Int
-  -> MaybeListZipper Int
-  -> Bool
-prop_moveRightN_negative (Positive n) z =
-  moveRightN (negate n) z == moveLeftN n z
+prop_moveRightN n z
+  | n == 0 = moveRightN n z == z
+  | n > 0 = moveRightN n z == moveRightN (pred n) (moveRight z)
+  | otherwise = moveRightN (negate n) z == moveLeftN n z
 
 prop_moveLeftN' ::
   Int
