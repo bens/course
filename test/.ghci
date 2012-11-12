@@ -1,7 +1,8 @@
 :set -i../src -isrc
 :m + Test.QuickCheck
 :l Main
-:set prompt "test>> "
+:def test (\x -> return (":main --plain" ++ (if null x then x else " -t "++x)))
+:set prompt "%s [test]> "
 :set -Wall
 :set -fno-warn-unused-imports
 :set -fno-warn-unused-binds
