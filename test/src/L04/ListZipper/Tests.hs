@@ -23,13 +23,12 @@ test =
   testGroup "ListZipper"
     [
       testCase "furry on ListZipper" testcase_furryListZipper
-    , testCase "furry on MaybeListZipper" testcase_furryMaybeListZipper
+    , testProperty "furry composes on ListZipper" prop_furry_compose
+    , testProperty "furry on MaybeListZipper" prop_furry_MaybeListZipper
     , testProperty "fromList/toList roundtrip" prop_fromList_toList
     , testProperty "toMaybe" prop_toMaybe
-    , testCase "withFocus (front)" testcase_withFocus_front
-    , testCase "withFocus (middle)" testcase_withFocus_middle
-    , testCase "setFocus (front)" testcase_setFocus_front
-    , testCase "setFocus (middle)" testcase_setFocus_middle
+    , testProperty "withFocus" prop_withFocus
+    , testProperty "setFocus" prop_setFocus
     , testCase "hasLeft (yes)" testcase_hasLeft_yes
     , testCase "hasLeft (no)" testcase_hasLeft_no
     , testCase "hasRight (yes)" testcase_hasRight_yes
@@ -97,11 +96,22 @@ testcase_furryListZipper =
   furry (+1) (ListZipper [3,2,1] (4 :: Int) [5,6,7]) @?=
     (ListZipper [4,3,2] 5 [6,7,8])
 
-testcase_furryMaybeListZipper ::
-  Assertion
-testcase_furryMaybeListZipper =
-  furry (+1) (IsZ (ListZipper [3,2,1] (4 :: Int) [5,6,7])) @?=
-    IsZ (ListZipper [4,3,2] 5 [6,7,8])
+prop_furry_compose ::
+  Fun Int Int
+  -> Fun Int Int
+  -> ListZipper Int
+  -> Bool
+prop_furry_compose (Fun _ f) (Fun _ g) z =
+  (furry g . furry f) z == furry (g . f) z
+
+prop_furry_MaybeListZipper ::
+  Fun Int Int
+  -> MaybeListZipper Int
+  -> Bool
+prop_furry_MaybeListZipper (Fun _ f) z =
+  case z of
+    IsNotZ -> furry f z == z
+    IsZ z' -> furry f z == IsZ (furry f z')
 
 prop_fromList_toList ::
   [Int]
@@ -113,29 +123,19 @@ prop_toMaybe ::
   [Int]
   -> Bool
 prop_toMaybe xs =
-  if null xs then m == Nothing else m /= Nothing
-  where
-    m = toMaybe (fromList xs)
+  (if null xs then (== Nothing) else (/= Nothing)) $ toMaybe (fromList xs)
 
-testcase_withFocus_front ::
-  Assertion
-testcase_withFocus_front =
-  withFocus (+1) (ListZipper [] 0 [1]) @?= ListZipper [] 1 [1 :: Int]
+prop_withFocus ::
+  ListZipper Int
+  -> Bool
+prop_withFocus z@(ListZipper ls x rs) =
+  withFocus (+1) z == ListZipper ls (x+1) rs
 
-testcase_withFocus_middle ::
-  Assertion
-testcase_withFocus_middle =
-  withFocus (+1) (ListZipper [1,0] 2 [3,4]) @?= ListZipper [1,0] 3 [3,4 :: Int]
-
-testcase_setFocus_front ::
-  Assertion
-testcase_setFocus_front =
-  setFocus 1 (ListZipper [] 0 [1]) @?= ListZipper [] 1 [1 :: Int]
-
-testcase_setFocus_middle ::
-  Assertion
-testcase_setFocus_middle =
-  setFocus 1 (ListZipper [1,0] 2 [3,4]) @?= ListZipper [1,0] 1 [3,4 :: Int]
+prop_setFocus ::
+  ListZipper Int
+  -> Bool
+prop_setFocus z@(ListZipper ls _ rs) =
+  setFocus 1 z == ListZipper ls 1 rs
 
 testcase_hasLeft_yes ::
   Assertion
