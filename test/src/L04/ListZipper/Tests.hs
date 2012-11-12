@@ -183,9 +183,9 @@ prop_findLeft_1_unit ::
   -> MaybeListZipper Int
   -> Bool
 prop_findLeft_1_unit (Fun _ f) z =
-  let u0 = findLeft (const True)
-  in (u0 . findLeft f) z == findLeft f z &&
-     (findLeft f . u0) z == findLeft f z
+  let u1 = findLeft (const True)
+  in (u1 . findLeft f) z == findLeft f z &&
+     (findLeft f . u1) z == findLeft f z
 
 testcase_findRight_empty ::
   Assertion
@@ -213,9 +213,9 @@ prop_findRight_1_unit ::
   -> MaybeListZipper Int
   -> Bool
 prop_findRight_1_unit (Fun _ f) z =
-  let u0 = findRight (const True)
-  in (u0 . findRight f) z == findRight f z &&
-     (findRight f . u0) z == findRight f z
+  let u1 = findRight (const True)
+  in (u1 . findRight f) z == findRight f z &&
+     (findRight f . u1) z == findRight f z
 
 testcase_moveLeftLoop_empty ::
   Assertion
