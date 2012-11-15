@@ -36,11 +36,11 @@ test =
     , testCase "findLeft (empty)" testcase_findLeft_empty
     , testProperty "findLeft" prop_findLeft
     , testProperty "findLeft has a 0 unit" prop_findLeft_0_unit
-    -- , testProperty "findLeft has an identity" prop_findLeft_1_unit
+    , testProperty "findLeft has an identity" prop_findLeft_1_unit
     , testCase "findRight (empty)" testcase_findRight_empty
     , testProperty "findRight" prop_findRight
     , testProperty "findRight has a 0 unit" prop_findRight_0_unit
-    -- , testProperty "findRight has an identity" prop_findRight_1_unit
+    , testProperty "findRight has an identity" prop_findRight_1_unit
     , testCase "moveLeftLoop (empty)" testcase_moveLeftLoop_empty
     , testCase "moveLeftLoop (looping)" testcase_moveLeftLoop_loop
     , testCase "moveLeftLoop (no looping)" testcase_moveLeftLoop_noloop
@@ -166,8 +166,8 @@ prop_findLeft ::
   Fun Int Bool
   -> ListZipper Int
   -> Bool
-prop_findLeft (Fun _ f) z@(ListZipper ls _ _) =
-  (if null (filter f ls) then (== IsNotZ) else (/= IsNotZ)) $ findLeft f z
+prop_findLeft (Fun _ f) z@(ListZipper ls x _) =
+  (if null (filter f (x:ls)) then (== IsNotZ) else (/= IsNotZ)) $ findLeft f z
 
 prop_findLeft_0_unit ::
   Fun Int Bool
@@ -177,7 +177,6 @@ prop_findLeft_0_unit (Fun _ f) z =
   let u0 = findLeft (const False)
   in (u0 . findLeft f) z == u0 z && (findLeft f . u0) z == u0 z
 
--- Not currently true
 prop_findLeft_1_unit ::
   Fun Int Bool
   -> MaybeListZipper Int
@@ -196,8 +195,8 @@ prop_findRight ::
   Fun Int Bool
   -> ListZipper Int
   -> Bool
-prop_findRight (Fun _ f) z@(ListZipper _ _ rs) =
-  (if null (filter f rs) then (== IsNotZ) else (/= IsNotZ)) $ findRight f z
+prop_findRight (Fun _ f) z@(ListZipper _ x rs) =
+  (if null (filter f (x:rs)) then (== IsNotZ) else (/= IsNotZ)) $ findRight f z
 
 prop_findRight_0_unit ::
   Fun Int Bool
@@ -207,7 +206,6 @@ prop_findRight_0_unit (Fun _ f) z =
   let u0 = findRight (const False)
   in (u0 . findRight f) z == u0 z && (findRight f . u0) z == u0 z
 
--- Not currently true
 prop_findRight_1_unit ::
   Fun Int Bool
   -> MaybeListZipper Int
