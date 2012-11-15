@@ -372,16 +372,20 @@ prop_moveRightN' n z@(ListZipper _ _ rs) =
     _ -> False
 
 prop_nth ::
-  Int
-  -> MaybeListZipper Int
+  MaybeListZipper Int
   -> Property
-prop_nth n z =
-  cover withinBounds 80 "Index is within zipper's bounds" $
-    if withinBounds
-      then moveLeftN n (nth n z) == fromList (toList z)
-      else nth n z == IsNotZ
-  where
-    withinBounds = 0 <= n && n < length (toList z)
+prop_nth z =
+  let d = succ (2 * length (toList z))
+      genI = (\i -> (i `mod` d) - (d `div` 4)) `fmap` arbitrary
+  in forAll genI $ \i ->
+       case (i < 0, length (toList z) <= i) of
+         (True, _) ->
+           label "Index is less than zero" $ nth i z == IsNotZ
+         (_, True) ->
+           label "Index is beyond the end of the zipper" $ nth i z == IsNotZ
+         (_, _) ->
+           label "Index is within zipper's bounds" $
+             moveLeftN i (nth i z) == fromList (toList z)
 
 prop_index ::
   MaybeListZipper Int
