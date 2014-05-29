@@ -1,44 +1,32 @@
-module Course
-(
-  module L01.Optional
-, module L01.Validation
-, module L02.List
-, module L03.Fluffy
-, module L03.Misty
-, module L03.State
-, module L04.ListZipper
-, module L04.Testing
-, module L05.Person
-, module L05.Parser
-, module L06.JsonValue
-, module L06.MoreParser
-, module L06.JsonParser
-, module L07.Anagrams
-, module L07.FastAnagrams
-, module L08.EditDistance
-, module L08.MetricSpace
-, module L08.BKTree
-, module L09.Compose
-, module L10.Cheque
-) where
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
-import L01.Optional
-import L01.Validation
-import L02.List
-import L03.Fluffy
-import L03.Misty
-import L03.State
-import L04.ListZipper
-import L04.Testing hiding (tests)
-import L05.Person
-import L05.Parser
-import L06.JsonValue
-import L06.MoreParser
-import L06.JsonParser
-import L07.Anagrams
-import L07.FastAnagrams
-import L08.EditDistance
-import L08.MetricSpace
-import L08.BKTree
-import L09.Compose
-import L10.Cheque
+module Course (module X) where
+
+import Course.Anagrams as X
+import Course.Applicative as X
+import Course.Apply as X
+import Course.Bind as X
+import Course.Cheque as X
+import Course.Comonad as X
+import Course.Compose as X
+import Course.Core as X
+import Course.Extend as X
+import Course.FastAnagrams as X
+import Course.FileIO as X
+import Course.Functor as X
+import Course.Id as X
+import Course.Interactive as X
+import Course.JsonParser as X
+import Course.JsonValue as X
+import Course.List as X
+import Course.ListZipper as X
+import Course.Monad as X
+import Course.MoreParser as X
+import Course.Optional as X
+import Course.Parser as X
+import Course.Person as X
+import Course.State as X
+import Course.StateT as X
+import Course.Traversable as X
+import Course.Validation as X
